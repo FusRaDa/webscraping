@@ -20,17 +20,18 @@ url_parser.read('url.txt')
 config_url = url_parser.get('url', 'link')
 config_token = url_parser.get('url', 'token')
 
-file_name = 'webscrape_' + class_category + '.json'
 
-# Initialize emtpy json file
+# Initialize empty json file for processing data
+file_name = 'webscrape_' + class_category + '.json'
 with open(file_name, 'w') as empty_json:
     json.dump([], empty_json, indent=4)
     empty_json.close()
 
-# Initialize empty txt file
-txt_file_name = 'html_string' + class_category + '.txt'
-txt_file = open(txt_file_name, "w", encoding='utf-16')
-txt_file.close()
+# Initialize empty json file for raw html data
+html_data = 'webscrape_' + class_category + '_raw_html.json'
+with open(html_data, 'w') as empty_json:
+    json.dump([], empty_json, indent=4)
+    empty_json.close()
 
 
 def get_class_from_category(string):
@@ -81,6 +82,19 @@ def write_json_data(data_dict):
         json.dump(data, write, indent=4)
 
 
+def write_json_data_raw(raw_html):
+    # read file
+    with open(html_data, "r") as read:
+        data = json.load(read)
+
+    # update json object
+    data.append(raw_html)
+
+    # write json file
+    with open(html_data, 'w') as write:
+        json.dump(data, write, indent=4)
+
+
 def scrape_data_from_url_page(url):
     time.sleep(5)
 
@@ -100,9 +114,7 @@ def scrape_data_from_url_page(url):
     for linebreak in soup.find_all('br'):
         linebreak.replaceWith("~")
 
-    with open(txt_file_name, "a", encoding='utf-16') as f:
-        f.write(html + "\n")
-    f.close()
+    write_json_data_raw(html)
 
     # Get Data and Transfer to Txt File
     title = soup.find('span', id='title')
